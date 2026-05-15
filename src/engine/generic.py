@@ -131,10 +131,15 @@ class YoutubeDownload(BaseDownloader):
         for f in formats:
             ydl_opts["format"] = f
             logging.info("yt-dlp options: %s", ydl_opts)
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([self._url])
-            files = list(Path(self._tempdir.name).glob("*"))
-            break
+            try:
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([self._url])
+                files = list(Path(self._tempdir.name).glob("*"))
+                if files:
+                    break
+            except Exception as e:
+                logging.warning("Download failed with format %s, trying next. Error: %s", f, e)
+                continue
 
         return files
 
