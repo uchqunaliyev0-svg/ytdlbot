@@ -50,8 +50,8 @@ class Setting(Base):
     __tablename__ = "settings"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    quality = Column(Enum("high", "medium", "low", "audio", "custom"), nullable=False, default="high")
-    format = Column(Enum("video", "audio", "document"), nullable=False, default="video")
+    quality = Column(Enum("high", "medium", "low", "audio", "custom", name="quality_enum"), nullable=False, default="high")
+    format = Column(Enum("video", "audio", "document", name="format_enum"), nullable=False, default="video")
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     user = relationship("User", back_populates="settings")
@@ -69,6 +69,7 @@ class Payment(Base):
             PaymentStatus.COMPLETED,
             PaymentStatus.FAILED,
             PaymentStatus.REFUNDED,
+            name="payment_status_enum",
         ),
         nullable=False,
     )
