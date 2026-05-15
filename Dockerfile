@@ -1,9 +1,9 @@
 FROM python:3.12-alpine AS pybuilder
 ADD pyproject.toml pdm.lock /build/
 WORKDIR /build
-RUN apk add alpine-sdk python3-dev musl-dev linux-headers
+RUN apk add alpine-sdk python3-dev musl-dev linux-headers postgresql-dev libpq-dev
 RUN pip install pdm
-RUN pdm install
+RUN pdm install --no-lock
 
 FROM python:3.12-alpine AS runner
 WORKDIR /app
