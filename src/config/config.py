@@ -29,7 +29,8 @@ WORKERS: int = get_env("WORKERS", 100)
 APP_ID: int = get_env("APP_ID")
 APP_HASH = get_env("APP_HASH")
 BOT_TOKEN = get_env("BOT_TOKEN")
-OWNER = [int(i) for i in str(get_env("OWNER")).split(",")]
+owner_env = get_env("OWNER", "")
+OWNER = [int(i) for i in str(owner_env).split(",")] if owner_env else []
 # db settings
 AUTHORIZED_USER: str = get_env("AUTHORIZED_USER", "")
 DB_DSN = get_env("DB_DSN")
