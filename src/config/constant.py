@@ -15,35 +15,34 @@ from pyrogram import Client, types
 class BotText:
 
     start = """
-    Welcome to YouTube Download bot. Type /help for more information.
-    EU🇪🇺: @benny_2ytdlbot
-    SG🇸🇬：@benny_ytdlbot
+🎬 YouTube va boshqa saytlardan video yuklab olish botiga xush kelibsiz!
 
-    Join https://t.me/ytdlbot0 for updates.\n\n"""
+📌 /help — bot imkoniyatlari haqida ma'lumot
+"""
 
     help = """
-1. For YouTube and any websites supported by yt-dlp, just send the link and we will engine and send it to you.
+1. YouTube va yt-dlp tomonidan qo'llab-quvvatlanadigan istalgan sayt havolasini yuboring — bot yuklab beradi.
 
-2. For specific links use `/spdl {URL}`. More info at https://github.com/tgbot-collection/ytdlbot#supported-websites 
+2. Maxsus havolalar uchun: `/spdl {URL}` buyrug'idan foydalaning.
 
-3. If the bot doesn't work, try again or join https://t.me/ytdlbot0 for updates.
+3. Agar bot ishlamasa, qayta urinib ko'ring.
 
-4. Want to deploy it yourself?\nHere's the source code: https://github.com/tgbot-collection/ytdlbot
+4. Video sifati va formatini o'zgartirish uchun /settings buyrug'idan foydalaning.
     """
 
-    about = "YouTube Downloader by @BennyThink.\n\nOpen source on GitHub: https://github.com/tgbot-collection/ytdlbot"
+    about = "YouTube Downloader bot — video va audio yuklab olish uchun qulay vosita."
 
     settings = """
-Please choose the preferred format and video quality for your video. These settings only **apply to YouTube videos**.
-High: 1080P
-Medium: 720P
-Low: 480P
+Video formati va sifatini tanlang. Bu sozlamalar faqat **YouTube videolari** uchun amal qiladi.
+🔴 Yuqori: 1080P
+🟡 O'rta: 720P
+🟢 Past: 480P
 
-If you choose to send the video as a document, Telegram client will not be able stream it.
+Videoni fayl sifatida yuborsangiz, Telegram uni to'g'ridan to'g'ri ijro eta olmaydi.
 
-Your current settings:
-Video quality: {}
-Sending type: {}
+Joriy sozlamalaringiz:
+Video sifati: {}
+Yuborish turi: {}
 """
 
 
