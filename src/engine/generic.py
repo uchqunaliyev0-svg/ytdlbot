@@ -106,10 +106,14 @@ class YoutubeDownload(BaseDownloader):
         }
         # setup cookies for youtube only
         if is_youtube(self._url):
+            if yt_cookies := os.getenv("YOUTUBE_COOKIES"):
+                with open("youtube-cookies.txt", "w") as f:
+                    # Railway Variables ko'pincha \n ni \\n deb o'qiydi, shuni to'g'rilaymiz
+                    f.write(yt_cookies.replace('\\n', '\n'))
             # use cookies from browser firstly
             if browsers := os.getenv("BROWSERS"):
                 ydl_opts["cookiesfrombrowser"] = browsers.split(",")
-            if os.path.isfile("youtube-cookies.txt") and os.path.getsize("youtube-cookies.txt") > 100:
+            if os.path.isfile("youtube-cookies.txt") and os.path.getsize("youtube-cookies.txt") > 10:
                 ydl_opts["cookiefile"] = "youtube-cookies.txt"
             # try add extract_args if present
             if potoken := os.getenv("POTOKEN"):
