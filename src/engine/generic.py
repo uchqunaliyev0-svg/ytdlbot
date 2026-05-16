@@ -129,6 +129,7 @@ class YoutubeDownload(BaseDownloader):
             formats = ["source"] + formats
 
         files = None
+        last_error = None
         for f in formats:
             ydl_opts["format"] = f
             logging.info("yt-dlp options: %s", ydl_opts)
@@ -140,10 +141,11 @@ class YoutubeDownload(BaseDownloader):
                     break
             except Exception as e:
                 logging.warning("Download failed with format %s, trying next. Error: %s", f, e)
+                last_error = str(e)
                 continue
 
         if not files:
-            raise ValueError("Barcha formatlar sinab ko'rildi, lekin videoni yuklab bo'lmadi. Bu video YouTube tomonidan maxsus himoyalangan yoki Railway IP si bloklangan bo'lishi mumkin.")
+            raise ValueError(f"Barcha formatlar sinab ko'rildi, lekin videoni yuklab bo'lmadi.\nYouTube Maxsus himoyasi yoki IP blok:\nXato: {last_error}")
 
         return files
 
