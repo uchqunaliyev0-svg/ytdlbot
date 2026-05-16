@@ -67,12 +67,6 @@ def create_app(name: str, workers: int = 64) -> Client:
 
 app = create_app("main")
 
-main_menu = types.ReplyKeyboardMarkup(
-    [
-        ["⚙️ Sozlamalar", "ℹ️ Ma'lumot"]
-    ],
-    resize_keyboard=True
-)
 REQUIRED_CHANNEL = os.getenv("REQUIRED_CHANNEL", "@NexVid_Ai")
 
 
@@ -102,10 +96,11 @@ def private_use(func):
                     raise ValueError("Not joined")
             except Exception:
                 markup = types.InlineKeyboardMarkup([
-                    [types.InlineKeyboardButton("Kanalga a'zo bo'lish 🚀", url=f"https://t.me/{REQUIRED_CHANNEL.replace('@', '')}")]
+                    [types.InlineKeyboardButton("Kanalga a'zo bo'lish 🚀", url=f"https://t.me/{REQUIRED_CHANNEL.replace('@', '')}")],
+                    [types.InlineKeyboardButton("A'zo bo'ldim ✅", callback_data="check_sub")]
                 ])
                 message.reply_text(
-                    f"Hurmatli foydalanuvchi!\n\nBotdan foydalanish uchun {REQUIRED_CHANNEL} kanaliga a'zo bo'lishingiz shart. Iltimos, kanalga a'zo bo'lib, qayta urinib ko'ring.",
+                    f"Hurmatli foydalanuvchi!\n\nBotdan foydalanish uchun {REQUIRED_CHANNEL} kanaliga a'zo bo'lishingiz shart. Iltimos, kanalga a'zo bo'lib, tekshirish tugmasini bosing.",
                     reply_markup=markup,
                     quote=True
                 )
@@ -127,16 +122,23 @@ def start_handler(client: Client, message: types.Message):
         from_id,
         BotText.start + f"\nSizda {free} ta bepul va {paid} ta pulli kvota bor.",
         disable_web_page_preview=True,
-        reply_markup=main_menu
+        reply_markup=types.ReplyKeyboardRemove()
     )
 
 
-@app.on_message(filters.command(["help", "about"]) | filters.regex("^ℹ️ Ma'lumot$"))
+@app.on_message(filters.command(["help"]))
 def help_handler(client: Client, message: types.Message):
     chat_id = message.chat.id
     init_user(chat_id)
     client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-    client.send_message(chat_id, BotText.help, disable_web_page_preview=True, reply_markup=main_menu)
+    client.send_message(chat_id, BotText.help, disable_web_page_preview=True)
+
+@app.on_message(filters.command(["about"]))
+def about_handler(client: Client, message: types.Message):
+    chat_id = message.chat.id
+    init_user(chat_id)
+    client.send_chat_action(chat_id, enums.ChatAction.TYPING)
+    client.send_message(chat_id, BotText.about)
 
 
 @app.on_message(filters.command(["ping"]))
@@ -271,7 +273,7 @@ def stats_handler(client: Client, message: types.Message):
         message.reply_text(user_stats, quote=True)
 
 
-@app.on_message(filters.command(["settings"]) | filters.regex("^⚙️ Sozlamalar$"))
+@app.on_message(filters.command(["settings"]))
 def settings_handler(client: Client, message: types.Message):
     chat_id = message.chat.id
     init_user(chat_id)
@@ -414,6 +416,23 @@ def quality_callback(client: Client, callback_query: types.CallbackQuery):
     logging.info("Setting %s download quality to %s", chat_id, data)
     callback_query.answer(f"Your default engine quality was set to {callback_query.data}")
     set_user_settings(chat_id, "quality", data)
+
+
+@app.on_callback_query(filters.regex(r"^check_sub$"))
+def check_sub_callback(client: Client, callback_query: types.CallbackQuery):
+    chat_id = callback_query.from_user.id
+    if not REQUIRED_CHANNEL:
+        callback_query.answer("Kanal talab qilinmagan.", show_alert=True)
+        return
+    try:
+        member = client.get_chat_member(REQUIRED_CHANNEL, chat_id)
+        if member.status in [enums.ChatMemberStatus.BANNED, enums.ChatMemberStatus.LEFT]:
+            callback_query.answer("Siz hali kanalga a'zo bo'lmagansiz! Iltimos, a'zo bo'ling.", show_alert=True)
+        else:
+            callback_query.message.delete()
+            client.send_message(chat_id, "Rahmat! Endi menga video havolasini yuborishingiz mumkin.")
+    except Exception:
+        callback_query.answer("Siz hali kanalga a'zo bo'lmagansiz!", show_alert=True)
 
 
 if __name__ == "__main__":
