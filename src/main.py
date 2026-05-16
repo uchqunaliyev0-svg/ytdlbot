@@ -112,6 +112,7 @@ def private_use(func):
 
 
 @app.on_message(filters.command(["start"]))
+@private_use
 def start_handler(client: Client, message: types.Message):
     from_id = message.chat.id
     init_user(from_id)
@@ -126,19 +127,7 @@ def start_handler(client: Client, message: types.Message):
     )
 
 
-@app.on_message(filters.command(["help"]))
-def help_handler(client: Client, message: types.Message):
-    chat_id = message.chat.id
-    init_user(chat_id)
-    client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-    client.send_message(chat_id, BotText.help, disable_web_page_preview=True)
 
-@app.on_message(filters.command(["about"]))
-def about_handler(client: Client, message: types.Message):
-    chat_id = message.chat.id
-    init_user(chat_id)
-    client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-    client.send_message(chat_id, BotText.about)
 
 
 @app.on_message(filters.command(["ping"]))
@@ -273,29 +262,6 @@ def stats_handler(client: Client, message: types.Message):
         message.reply_text(user_stats, quote=True)
 
 
-@app.on_message(filters.command(["settings"]))
-def settings_handler(client: Client, message: types.Message):
-    chat_id = message.chat.id
-    init_user(chat_id)
-    client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-    markup = types.InlineKeyboardMarkup(
-        [
-            [  # First row
-                types.InlineKeyboardButton("send as document", callback_data="document"),
-                types.InlineKeyboardButton("send as video", callback_data="video"),
-                types.InlineKeyboardButton("send as audio", callback_data="audio"),
-            ],
-            [  # second row
-                types.InlineKeyboardButton("High Quality", callback_data="high"),
-                types.InlineKeyboardButton("Medium Quality", callback_data="medium"),
-                types.InlineKeyboardButton("Low Quality", callback_data="low"),
-            ],
-        ]
-    )
-
-    quality = get_quality_settings(chat_id)
-    send_type = get_format_settings(chat_id)
-    client.send_message(chat_id, BotText.settings.format(quality, send_type), reply_markup=markup)
 
 
 @app.on_message(filters.command(["direct"]))
@@ -400,22 +366,7 @@ def download_handler(client: Client, message: types.Message):
         message.reply_text(f"❌ Download failed: {e}", quote=True)
 
 
-@app.on_callback_query(filters.regex(r"document|video|audio"))
-def format_callback(client: Client, callback_query: types.CallbackQuery):
-    chat_id = callback_query.message.chat.id
-    data = callback_query.data
-    logging.info("Setting %s file type to %s", chat_id, data)
-    callback_query.answer(f"Your send type was set to {callback_query.data}")
-    set_user_settings(chat_id, "format", data)
 
-
-@app.on_callback_query(filters.regex(r"high|medium|low"))
-def quality_callback(client: Client, callback_query: types.CallbackQuery):
-    chat_id = callback_query.message.chat.id
-    data = callback_query.data
-    logging.info("Setting %s download quality to %s", chat_id, data)
-    callback_query.answer(f"Your default engine quality was set to {callback_query.data}")
-    set_user_settings(chat_id, "quality", data)
 
 
 @app.on_callback_query(filters.regex(r"^check_sub$"))
