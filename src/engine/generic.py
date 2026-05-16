@@ -41,6 +41,7 @@ class YoutubeDownload(BaseDownloader):
             # webm , vp9 and av01 are not streamable on telegram, so we'll extract only mp4
             "bestvideo[ext=mp4][vcodec!*=av01][vcodec!*=vp09]+bestaudio[ext=m4a]/bestvideo+bestaudio",
             "bestvideo[vcodec^=avc]+bestaudio[acodec^=mp4a]/best[vcodec^=avc]/best",
+            "best",
             None,
         ]
         audio = AUDIO_FORMAT or "m4a"
@@ -140,6 +141,9 @@ class YoutubeDownload(BaseDownloader):
             except Exception as e:
                 logging.warning("Download failed with format %s, trying next. Error: %s", f, e)
                 continue
+
+        if not files:
+            raise ValueError("Barcha formatlar sinab ko'rildi, lekin videoni yuklab bo'lmadi. Bu video YouTube tomonidan maxsus himoyalangan yoki Railway IP si bloklangan bo'lishi mumkin.")
 
         return files
 
