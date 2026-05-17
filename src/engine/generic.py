@@ -116,13 +116,12 @@ class YoutubeDownload(BaseDownloader):
                 ydl_opts["cookiesfrombrowser"] = browsers.split(",")
             if os.path.isfile("youtube-cookies.txt") and os.path.getsize("youtube-cookies.txt") > 10:
                 ydl_opts["cookiefile"] = "youtube-cookies.txt"
+            # default extractor_args to bypass bot protection even without cookies
+            ydl_opts["extractor_args"] = {"youtube": ["player_client=ios,android,web"]}
+            
             # try add extract_args if present
             if potoken := os.getenv("POTOKEN"):
-                ydl_opts["extractor_args"] = {"youtube": ["player-client=web,default", f"po_token=web+{potoken}"]}
-                # for new version? https://github.com/yt-dlp/yt-dlp/wiki/PO-Token-Guide
-                # ydl_opts["extractor_args"] = {
-                #     "youtube": [f"po_token=web.player+{potoken}", f"po_token=web.gvs+{potoken}"]
-                # }
+                ydl_opts["extractor_args"]["youtube"].extend(["player-client=web,default", f"po_token=web+{potoken}"])
 
         if self._url.startswith("https://drive.google.com"):
             # Always use the `source` format for Google Drive URLs.
@@ -145,7 +144,7 @@ class YoutubeDownload(BaseDownloader):
                 continue
 
         if not files:
-            raise ValueError(f"Barcha formatlar sinab ko'rildi, lekin videoni yuklab bo'lmadi.\nYouTube Maxsus himoyasi yoki IP blok:\nXato: {last_error}")
+            raise ValueError(f"Barcha formatlar sinab ko'rildi, lekin videoni yuklab bo'lmadi.\nYouTube Maxsus himoyasi (Bot Protection) yoki IP blok.\n\nIltimos Railway (yoki server) da 'YOUTUBE_COOKIES' o'zgaruvchisini sozlang.\n\nXato: {last_error}")
 
         return files
 
